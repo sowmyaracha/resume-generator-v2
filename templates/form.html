@@ -1,312 +1,805 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Content Processor</title>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Resume Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #0a0a0a;
+    --white: #ffffff;
+    --gray-50: #f9f9f9;
+    --gray-100: #f0f0f0;
+    --gray-200: #e0e0e0;
+    --gray-400: #a0a0a0;
+    --gray-600: #606060;
+    --gray-800: #202020;
+    --accent: #1a1a1a;
+    --accent-hover: #333;
+    --success: #16a34a;
+    --error: #dc2626;
+    --border: 1px solid var(--gray-200);
+    --radius: 10px;
+    --radius-sm: 6px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--gray-50);
+    color: var(--black);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--white);
+    border-bottom: var(--border);
+    padding: 0 40px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .logo-dot {
+    width: 8px; height: 8px;
+    background: var(--black);
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .header-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    background: var(--gray-100);
+    color: var(--gray-600);
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: var(--border);
+  }
+
+  /* ── Main layout ── */
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  .page-title {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+
+  .page-subtitle {
+    font-size: 14px;
+    color: var(--gray-600);
+    margin-bottom: 36px;
+  }
+
+  /* ── Steps ── */
+  .steps {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 36px;
+    flex-wrap: wrap;
+  }
+
+  .step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--gray-400);
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: var(--border);
+    background: var(--white);
+    transition: all 0.2s;
+  }
+
+  .step.active {
+    color: var(--black);
+    border-color: var(--black);
+    background: var(--black);
+    color: var(--white);
+  }
+
+  .step.done {
+    color: var(--success);
+    border-color: #bbf7d0;
+    background: #f0fdf4;
+  }
+
+  .step-num {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: currentColor;
+    color: var(--white);
+    font-size: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .step.active .step-num { background: var(--white); color: var(--black); }
+  .step.done .step-num { background: var(--success); color: var(--white); }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--white);
+    border: var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+
+  .card:hover { box-shadow: var(--shadow-md); }
+
+  .card-header {
+    padding: 16px 20px;
+    border-bottom: var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    color: var(--gray-600);
+  }
+
+  .card-body { padding: 20px; }
+
+  /* ── Grid ── */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  /* ── Form elements ── */
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 8px;
+  }
+
+  textarea, input[type="text"] {
+    width: 100%;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--black);
+    background: var(--gray-50);
+    border: var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    resize: vertical;
+    transition: border-color 0.15s, background 0.15s;
+    outline: none;
+  }
+
+  textarea:focus, input[type="text"]:focus {
+    border-color: var(--black);
+    background: var(--white);
+  }
+
+  textarea { min-height: 140px; line-height: 1.6; }
+
+  /* output textarea */
+  textarea.output {
+    background: var(--gray-50);
+    color: var(--gray-800);
+    font-family: 'DM Mono', monospace;
+    font-size: 12.5px;
+    min-height: 140px;
+  }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 9px 18px;
+    border-radius: var(--radius-sm);
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-decoration: none;
+  }
+
+  .btn-primary {
+    background: var(--black);
+    color: var(--white);
+  }
+
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-primary:active { transform: scale(0.98); }
+
+  .btn-secondary {
+    background: var(--white);
+    color: var(--black);
+    border: var(--border);
+  }
+
+  .btn-secondary:hover { background: var(--gray-100); }
+
+  .btn-success {
+    background: var(--success);
+    color: var(--white);
+  }
+
+  .btn-success:hover { background: #15803d; }
+
+  .btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+
+  /* ── Spinner ── */
+  .spinner {
+    width: 14px; height: 14px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .btn.loading .spinner { display: block; }
+  .btn.loading .btn-label { opacity: 0.7; }
+
+  /* ── Status badge ── */
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  .status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .status-idle { background: var(--gray-100); color: var(--gray-600); }
+  .status-running { background: #fef9c3; color: #854d0e; }
+  .status-done { background: #f0fdf4; color: var(--success); }
+  .status-error { background: #fef2f2; color: var(--error); }
+
+  /* ── Toast ── */
+  #toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--black);
+    color: var(--white);
+    padding: 12px 20px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all 0.25s;
+    pointer-events: none;
+    z-index: 999;
+    max-width: 320px;
+  }
+
+  #toast.show { opacity: 1; transform: translateY(0); }
+  #toast.error { background: var(--error); }
+  #toast.success { background: var(--success); }
+
+  /* ── Project rows ── */
+  .project-item {
+    border: var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+
+  .project-item:last-child { margin-bottom: 0; }
+
+  .project-header {
+    padding: 10px 14px;
+    background: var(--gray-50);
+    border-bottom: var(--border);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .project-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+
+  .project-col { padding: 12px 14px; }
+  .project-col:first-child { border-right: var(--border); }
+
+  .project-col label { margin-bottom: 6px; }
+
+  /* ── Divider ── */
+  .divider {
+    height: 1px;
+    background: var(--gray-200);
+    margin: 28px 0;
+  }
+
+  /* ── Generate section ── */
+  .generate-section {
+    background: var(--black);
+    border-radius: var(--radius);
+    padding: 28px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .generate-section h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 4px;
+  }
+
+  .generate-section p {
+    font-size: 13px;
+    color: var(--gray-400);
+  }
+
+  .btn-generate {
+    background: var(--white);
+    color: var(--black);
+    font-size: 14px;
+    font-weight: 600;
+    padding: 12px 28px;
+    border-radius: var(--radius-sm);
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-generate:hover { background: var(--gray-100); }
+  .btn-generate:active { transform: scale(0.98); }
+  .btn-generate:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ── Skills textarea ── */
+  #resumeSkills { min-height: 80px; }
+  #processedSkills { min-height: 80px; }
+</style>
 </head>
 <body>
-    <section class="section">
-        <div class="container">
-            <h1 class="title">Project Content Processor</h1>
-            <div class="control">
-                <textarea id="linkedin_link" class="textarea is-link" placeholder="Enter linkedin job link" rows="1"></textarea>
-            </div>
-            <br>
-            <div class="container">
-                <div class="field">
-                    <label class="label">Select resume</label>
-                    <div class="control">
-                        <div class="select">
-                            <select id="fileDropdown">
-                                <option value="">Select resume</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="control has-text-centered">
-                <button class="button is-link" id ="linkedin-button">extract job details</button>
-            </div>
-            <div class="control has-text-centered">
-                <button class="button is-link" id ="save_to_csv-button">save job</button>
-            </div>
-            <div class="columns">
-                <!-- Left Column for the Form -->
-                <div class="column is-half">
-                    <form id="processorForm">
-                        <div class="field">
-                            <label for="jd" class="label">Job Description:</label>
-                            <div class="control">
-                                <textarea id="jd" class="textarea is-link" placeholder="Enter job description" rows="10"></textarea>
-                            </div>
-                        </div>
 
-                        
+<header>
+  <div class="logo">
+    <span class="logo-dot"></span>
+    AI Resume Generator
+  </div>
+  <span class="header-badge">Powered by Mixtral-8x7B</span>
+</header>
 
-                        <div class="control has-text-centered">
-                            <button class="button is-link" type="submit">Process All</button>
-                        </div>
-                    </form>
-                </div>
-                
-                <!-- Right Column for the Result -->
-                <div class="column is-half">
-                    <div class="field">
-                        <label for="result" class="label">Processed Result:</label>
-                        <div class="control">
-                            <textarea id="result" class="textarea" placeholder="Your processed result will appear here..." rows="10"></textarea>
-                        </div>
-                    </div>
-                    <button class="button is-link" id="jd_process_button">Extract from JD</button>
-                </div>
-            </div>   
-        </div>
-    </section>
+<main>
+  <h1 class="page-title">Tailor your resume</h1>
+  <p class="page-subtitle">Paste a job description and let AI rewrite your resume to match it perfectly.</p>
 
-    <section>
-        <div class="container">
-            <div class="columns">
-                <!-- Left Column for the Form -->
-                <div class="column is-half">
-                    <div class="field">
-                        <label for="resume_skills" class="label">Resume Skills:</label>
-                        <div class="control">
-                            <textarea id="resume_skills" class="textarea" placeholder="Resume skills" rows="5" readonly></textarea>
-                        </div>
-                    </div>
-                    <div class="control has-text-centered">
-                        <button class="button is-link" id="process_skills_button">Process skills</button>
-                    </div>
-                </div>
-                <!-- Right Column for the Form -->
-                <div class="column is-half">
-                    <div class="field">
-                        <label for="processed_resume_skills" class="label">Processed Resume Skills:</label>
-                        <div class="control">
-                            <textarea id="processed_resume_skills" class="textarea" placeholder="Processed resume skills" rows="5"></textarea>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <div id="projectsContainer">
-        <!-- Project sections will be dynamically added here -->
+  <!-- Steps indicator -->
+  <div class="steps">
+    <div class="step active" id="step1">
+      <span class="step-num">1</span> Paste Job Description
     </div>
-
-    <div class="container">
-        <button class="button is-link" id="Generate_resume">Generate Resume</button>
+    <div class="step" id="step2">
+      <span class="step-num">2</span> Process with AI
     </div>
+    <div class="step" id="step3">
+      <span class="step-num">3</span> Generate Resume
+    </div>
+  </div>
 
-    <script>
-        var resume_content;
-        var processedProjects = {};
+  <!-- Step 1: Job Description -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Job Description</span>
+      <span class="status status-idle" id="jdStatus">
+        <span class="status-dot"></span> Ready
+      </span>
+    </div>
+    <div class="card-body">
+      <div class="grid-2">
+        <div>
+          <label>Paste job description here</label>
+          <textarea id="jobDescription" placeholder="Copy and paste the full job description from any job board — LinkedIn, Indeed, Greenhouse, Lever, etc."></textarea>
+        </div>
+        <div>
+          <label>Processed result (cover letter)</label>
+          <div id="processedResult" style="width:100%;min-height:140px;background:#f9f9f9;border:1px solid #e0e0e0;border-radius:6px;padding:12px 14px;font-size:13px;line-height:1.7;color:#202020;white-space:pre-wrap;overflow-y:auto;">AI generated cover letter will appear here...</div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="extractFromJD()">
+          <span class="spinner"></span>
+          <span class="btn-label">Extract from JD</span>
+        </button>
+        <button class="btn btn-primary" onclick="processAll()">
+          <span class="spinner"></span>
+          <span class="btn-label">Process All</span>
+        </button>
+        <button class="btn btn-secondary" onclick="clearJD()">Clear</button>
+      </div>
+    </div>
+  </div>
 
-        document.addEventListener('DOMContentLoaded', function() {
-            axios.get('/resume')
-            .then(function (response) {
-                resume_content = response.data;
-                document.getElementById('resume_skills').value = resume_content.skills.join(', ');
-                populateProjects(resume_content.projects);
-                console.log(resume_content);
-            })
-            .catch(function (error) {
-                console.error('Error:', error);
-                document.getElementById('resume_skills').value = 'An error occurred while fetching the resume content.';
-            });
-        });
+  <!-- Step 2: Skills -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Skills</span>
+      <span class="status status-idle" id="skillsStatus">
+        <span class="status-dot"></span> Ready
+      </span>
+    </div>
+    <div class="card-body">
+      <div class="grid-2">
+        <div>
+          <label>Your current skills</label>
+          <textarea id="resumeSkills"></textarea>
+        </div>
+        <div>
+          <label>AI-reordered skills (tailored to JD)</label>
+          <div id="processedSkills" style="width:100%;min-height:140px;background:#f9f9f9;border:1px solid #e0e0e0;border-radius:6px;padding:12px 14px;font-size:13px;line-height:1.7;color:#202020;white-space:pre-wrap;overflow-y:auto;">Reordered skills will appear here...</div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="processSkills()">
+          <span class="spinner"></span>
+          <span class="btn-label">Process Skills</span>
+        </button>
+      </div>
+    </div>
+  </div>
 
-        function populateProjects(projects) {
-            const container = document.getElementById('projectsContainer');
-            projects.forEach((project, index) => {
-                const projectSection = document.createElement('div');
-                projectSection.innerHTML = `
-                <div class="box">
-                <div class="columns">
-                    <div class="column is-half">
-                        <div class="field">
-                            <label for="project_${index}" class="label">${project.title}:</label>
-                            <div class="control">
-                                <textarea id="project_${index}" class="textarea is-link" rows="5" readonly>${project.description}</textarea>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="column is-half">
-                        <div class="field">
-                            <label for="processed_project_${index}" class="label">Processed ${project.title}:</label>
-                            <div class="control">
-                                <textarea id="processed_project_${index}" class="textarea" rows="5" placeholder="Processed project content will appear here..."></textarea>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                    <div class="control has-text-centered">
-                        <button class="button is-link process-project" data-index="${index}">Process Project</button>
-                    </div>
-                </div>
-                `;
-                container.appendChild(projectSection);
-                processedProjects[index] = project.description;
-            });
+  <!-- Step 2: Projects -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Projects</span>
+      <span class="status status-idle" id="projectsStatus">
+        <span class="status-dot"></span> Ready
+      </span>
+    </div>
+    <div class="card-body" id="projectsContainer">
+      <!-- Populated by JS -->
+    </div>
+  </div>
 
-            // Add event listeners to process project buttons
-            document.querySelectorAll('.process-project').forEach(button => {
-                button.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const index = this.getAttribute('data-index');
-                    processProject(index);
-                });
-            });
-        }
+  <!-- Step 3: Generate -->
+  <div class="generate-section">
+    <div>
+      <h3>Ready to generate your resume?</h3>
+      <p>Process skills and projects above, then click Generate to create your tailored PDF.</p>
+    </div>
+    <button class="btn-generate" id="generateBtn" onclick="generateResume()">
+      <span class="spinner" style="border-color:rgba(0,0,0,0.2); border-top-color:#000;"></span>
+      <span class="btn-label">Generate Resume PDF</span>
+    </button>
+  </div>
 
-        function processProject(index) {
-            const jd = document.getElementById('jd').value;
-            const project_content = document.getElementById(`project_${index}`).value;
+</main>
 
-            axios.post('/process', {
-                jd: jd,
-                project_content: project_content
-            })
-            .then(function (response) {
-                const processedContent = response.data.output.content;
-                document.getElementById(`processed_project_${index}`).value = processedContent;
-                processedProjects[index] = processedContent;
-            })
-            .catch(function (error) {
-                console.error('Error:', error);
-                document.getElementById(`processed_project_${index}`).value = 'An error occurred while processing your request.';
-            });
-        }
+<!-- Toast notification -->
+<div id="toast"></div>
 
-        document.getElementById('processorForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    // Process all projects
-    document.querySelectorAll('.process-project').forEach(button => {
-        const index = button.getAttribute('data-index');
-        processProject(index);
+<script>
+// ── State ──
+let resumeData = null;
+let processedProjects = [];
+
+// ── Toast ──
+function toast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show ' + type;
+  setTimeout(() => t.className = '', 3000);
+}
+
+// ── Set button loading state ──
+function setLoading(btn, loading) {
+  if (loading) btn.classList.add('loading');
+  else btn.classList.remove('loading');
+  btn.disabled = loading;
+}
+
+// ── Set status badge ──
+function setStatus(id, state, text) {
+  const el = document.getElementById(id);
+  el.className = 'status status-' + state;
+  el.innerHTML = `<span class="status-dot"></span> ${text}`;
+}
+
+// ── Step indicator ──
+function setStep(n) {
+  for (let i = 1; i <= 3; i++) {
+    const el = document.getElementById('step' + i);
+    el.className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
+    if (i < n) el.innerHTML = el.innerHTML.replace(/\d/, '✓');
+  }
+}
+
+// ── Load resume content on page load ──
+async function loadResume() {
+  try {
+    const res = await fetch('/resume');
+    resumeData = await res.json();
+
+    // Populate skills
+    const skills = Array.isArray(resumeData.skills)
+      ? (typeof resumeData.skills[0] === 'string' && resumeData.skills[0].includes(',')
+          ? resumeData.skills[0]
+          : resumeData.skills.join(', '))
+      : resumeData.skills;
+    document.getElementById('resumeSkills').value = skills;
+
+    // Populate projects
+    renderProjects(resumeData.projects);
+    processedProjects = resumeData.projects.map(p => p.description);
+  } catch(e) {
+    toast('Could not load resume data', 'error');
+  }
+}
+
+// ── Render project rows ──
+function renderProjects(projects) {
+  const container = document.getElementById('projectsContainer');
+  container.innerHTML = projects.map((p, i) => `
+    <div class="project-item">
+      <div class="project-header">${p.title}</div>
+      <div class="project-body">
+        <div class="project-col">
+          <label>Original description</label>
+          <textarea id="proj_orig_${i}" rows="4">${p.description}</textarea>
+        </div>
+        <div class="project-col">
+          <label>AI-tailored description</label>
+          <div id="proj_out_${i}" style="width:100%;min-height:100px;background:#f9f9f9;border:1px solid #e0e0e0;border-radius:6px;padding:12px 14px;font-size:12.5px;line-height:1.7;color:#202020;white-space:pre-wrap;overflow-y:auto;font-family:'DM Mono',monospace;">Tailored version will appear here...</div>
+          <div class="btn-row">
+            <button class="btn btn-secondary" style="font-size:12px;padding:6px 12px" onclick="processProject(${i})">
+              <span class="btn-label">Process this project</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── Extract from JD ──
+async function extractFromJD() {
+  const jd = document.getElementById('jobDescription').value.trim();
+  if (!jd) { toast('Please paste a job description first', 'error'); return; }
+
+  const btn = event.target.closest('.btn');
+  setLoading(btn, true);
+  setStatus('jdStatus', 'running', 'Analyzing...');
+
+  try {
+    const res = await fetch('/process_jd', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jd })
     });
+    const data = await res.json();
+    const coverText = typeof data.output === 'string' ? data.output : (data.output?.content || JSON.stringify(data.output));
+    document.getElementById('processedResult').innerHTML = coverText.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/\n/g,'<br>');
+    setStatus('jdStatus', 'done', 'Done');
+    setStep(2);
+    toast('JD analyzed successfully', 'success');
+  } catch(e) {
+    setStatus('jdStatus', 'error', 'Error');
+    toast('Failed to analyze JD', 'error');
+  } finally {
+    setLoading(btn, false);
+  }
+}
 
+// ── Process All (skills + all projects) ──
+async function processAll() {
+  const jd = document.getElementById('jobDescription').value.trim();
+  if (!jd) { toast('Please paste a job description first', 'error'); return; }
+
+  const btn = event.target.closest('.btn');
+  setLoading(btn, true);
+  setStatus('jdStatus', 'running', 'Processing all...');
+  setStatus('skillsStatus', 'running', 'Processing...');
+  setStatus('projectsStatus', 'running', 'Processing...');
+
+  try {
     // Process skills
-    document.getElementById('process_skills_button').click();
-});
+    const skills = document.getElementById('resumeSkills').value;
+    const skillsRes = await fetch('/process_skills', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jd, skills })
+    });
+    const skillsData = await skillsRes.json();
+    const skillsText = typeof skillsData.output === 'string' ? skillsData.output : (skillsData.output?.content || JSON.stringify(skillsData.output));
+    document.getElementById('processedSkills').innerHTML = skillsText.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/\n/g,'<br>');
+    setStatus('skillsStatus', 'done', 'Done');
 
-document.getElementById('jd_process_button').addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            const jd = document.getElementById('jd').value;
-            
+    // Process all projects
+    for (let i = 0; i < resumeData.projects.length; i++) {
+      const orig = document.getElementById(`proj_orig_${i}`).value;
+      const projRes = await fetch('/process', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jd, project_content: orig })
+      });
+      const projData = await projRes.json();
+      const projText = typeof projData.output === 'string' ? projData.output : (projData.output?.content || JSON.stringify(projData.output));
+      document.getElementById(`proj_out_${i}`).innerHTML = projText.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/\n/g,'<br>');
+      processedProjects[i] = projText;
+      processedProjects[i] = projData.output;
+    }
 
-            axios.post('/process_jd', {
-                jd: jd,
-                
-            })
-            .then(function (response) {
-                document.getElementById('result').value = response.data.output;
-            })
-            .catch(function (error) {
-                console.error('Error:', error);
-                document.getElementById('processed_resume_skills').value = 'An error occurred while processing your request.';
-            });
-        });
+    setStatus('projectsStatus', 'done', 'Done');
+    setStatus('jdStatus', 'done', 'All done');
+    setStep(3);
+    toast('All sections processed!', 'success');
+  } catch(e) {
+    setStatus('jdStatus', 'error', 'Error');
+    toast('Something went wrong. Check your API key.', 'error');
+  } finally {
+    setLoading(btn, false);
+  }
+}
 
-        document.getElementById('linkedin-button').addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            const linkedin_link = document.getElementById('linkedin_link').value;
-            
+// ── Process Skills only ──
+async function processSkills() {
+  const jd = document.getElementById('jobDescription').value.trim();
+  const skills = document.getElementById('resumeSkills').value.trim();
+  if (!jd) { toast('Please paste a job description first', 'error'); return; }
 
-            axios.post('/linkedinlink', {
-                link: linkedin_link, 
-            })
-            .then(function (response) {
-                document.getElementById('jd').value = response.data.job_description
-                document.getElementById('result').value = response.data.job_title;
-            })
-            .catch(function (error) {
-                console.error('Error:', error);
-                document.getElementById('linkedin-button').value = 'An error occurred while processing your request.';
-            });
-        });
+  const btn = event.target.closest('.btn');
+  setLoading(btn, true);
+  setStatus('skillsStatus', 'running', 'Processing...');
 
-        document.getElementById('save_to_csv-button').addEventListener('click', function(e) {
-            e.preventDefault();
-            axios.post('/save_to_csv', {
-                res:document.getElementById("fileDropdown").value
-                
-            })
-            .then(function (response) {
-               
-            })
-            .catch(function (error) {
-                console.error('Error:', error);
-                document.getElementById('save_to_csv-button').value = 'An error occurred while processing your request.';
-            });
-        });
+  try {
+    const res = await fetch('/process_skills', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jd, skills })
+    });
+    const data = await res.json();
+    const st = typeof data.output === 'string' ? data.output : (data.output?.content || JSON.stringify(data.output));
+    document.getElementById('processedSkills').innerHTML = st.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/\n/g,'<br>');  
+    setStatus('skillsStatus', 'done', 'Done');
+    toast('Skills processed', 'success');
+  } catch(e) {
+    setStatus('skillsStatus', 'error', 'Error');
+    toast('Failed to process skills', 'error');
+  } finally {
+    setLoading(btn, false);
+  }
+}
 
-        document.getElementById('process_skills_button').addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            const jd = document.getElementById('jd').value;
-            const pr_skills = document.getElementById('resume_skills').value;
+// ── Process single project ──
+async function processProject(i) {
+  const jd = document.getElementById('jobDescription').value.trim();
+  const orig = document.getElementById(`proj_orig_${i}`).value;
+  if (!jd) { toast('Please paste a job description first', 'error'); return; }
 
-            axios.post('/process_skills', {
-                jd: jd,
-                skills: pr_skills
-            })
-            .then(function (response) {
-                document.getElementById('processed_resume_skills').value = response.data.output.content;
-            })
-            .catch(function (error) {
-                console.error('Error:', error);
-                document.getElementById('processed_resume_skills').value = 'An error occurred while processing your request.';
-            });
-        });
+  const btn = event.target.closest('.btn');
+  setLoading(btn, true);
 
+  try {
+    const res = await fetch('/process', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jd, project_content: orig })
+    });
+    const data = await res.json();
+    const pt = typeof data.output === 'string' ? data.output : (data.output?.content || JSON.stringify(data.output));
+    document.getElementById(`proj_out_${i}`).innerHTML = pt.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/\n/g,'<br>');
+    processedProjects[i] = pt;
+    processedProjects[i] = data.output;
+    toast(`Project ${i + 1} processed`, 'success');
+  } catch(e) {
+    toast('Failed to process project', 'error');
+  } finally {
+    setLoading(btn, false);
+  }
+}
 
-        document.getElementById('Generate_resume').addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            const processedSkills = document.getElementById('processed_resume_skills').value;
-            const processedProjectsArray = Object.values(processedProjects);
+// ── Generate Resume ──
+async function generateResume() {
+  const btn = document.getElementById('generateBtn');
+  setLoading(btn, true);
 
-            axios.post('/generate_resume', {
-                skills: processedSkills,
-                projects: processedProjectsArray
-            })
-            .then(function (response) {
-                console.log("Resume generated successfully");
-                alert("Resume generated successfully");
-            })
-            .catch(function (error) {
-                console.error('Error:', error);
-                alert('An error occurred while generating the resume.');
-            });
-        });
-        function populateDropdownWithFiles(dropdownId) {
-            const dropdown = document.getElementById(dropdownId);
-            axios.get('/populate_resumes')
-                .then(function (response) {
-                    response.data.resumes.forEach(file => {
-                        const option = document.createElement('option');
-                        option.value = file;
-                        option.text = file;
-                        dropdown.appendChild(option);
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching files:', error);
-                });
-        }
+  const skills = document.getElementById('processedSkills').value ||
+                 document.getElementById('resumeSkills').value;
 
-        // Populate the dropdown when the page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            populateDropdownWithFiles('fileDropdown');
-        });
-    </script>
+  const projects = processedProjects.length > 0
+    ? processedProjects
+    : resumeData.projects.map(p => p.description);
+
+  try {
+    const res = await fetch('/generate_resume', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ skills, projects })
+    });
+    const data = await res.json();
+    toast('Resume PDF generated! Check your project folder for resume.pdf', 'success');
+    setStep(3);
+    document.getElementById('step3').className = 'step done';
+  } catch(e) {
+    toast('Failed to generate resume', 'error');
+  } finally {
+    setLoading(btn, false);
+  }
+}
+
+// ── Clear JD ──
+function clearJD() {
+  document.getElementById('processedResult').innerHTML = 'AI generated cover letter will appear here...';
+  document.getElementById('processedResult').value = '';
+  setStatus('jdStatus', 'idle', 'Ready');
+}
+
+// ── Init ──
+loadResume();
+</script>
 </body>
 </html>

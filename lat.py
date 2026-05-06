@@ -3,45 +3,57 @@ from pylatex.utils import bold
 
 # Define the resume content
 resume_content = {
-    "name": "Venkateshwar Reddy Darmanola",
-    "email": "venkat.re47@gmail.com",
-    "phone": "4698618663",
-    "portfolio": "https://www.github.com/frozenscar",
-    "linkedin": "https://www.linkedin.com/in/venkateshwar-reddy-darmanola-a056a1179",
+    "name": "Sowmya Racha",
+    "email": "sowmyar2024@gmail.com",
+    "phone": "8178259725",
+    "linkedin": "https://www.linkedin.com/in/sowmya-racha-a30678183/",
     "skills": [
     "C/C++", "Java", "Python", "SQL", "C#", "HTML", "CSS", "JavaScript", "RAG", "LangChain", "LangGraph", "AI Agents", "Chatbots", "LLM", "Llama3", "PyTorch", "Kafka", "CUDA", "PySpark", "Scala", "MLOps", "ETL", "Java Spring", "Microservices", "Maven", "GIT", "AWS", "EC2", "S3", "SageMaker", "Machine Learning", "Neural Networks", "TensorFlow", "ScikitLearn", "OpenCV", "Pandas", "matplotlib", "HuggingFace", "Diffusion models", "Transformers", "GCN", "Virtual Reality", "Unity3D", "Blender", "React", "NodeJS"
 ]
 ,
     "work_experience": [
         {
-            "company": "University of Texas at Arlington",
-            "location": "Texas, USA",
-            "duration": "Jul 2023 - May 2024",
-            "position": "Graduate Research and Teaching Assistant",
+            "company": "Rich Products Corporation",
+            "location": "Remote, USA",
+            "duration": "Jan 2025 - Mar 2026",
+            "position": "Software Engineer – AI",
             "achievements": [
-                "Developed a VR video recommendation system using PyTorch and a graph-learning based model, achieving a significant improvement (over 68% in recommendation precision) compared to state-of-the-art approaches.",
-                "Co-authored a research paper accepted for publication at the prestigious ACM MobiCom conference (average acceptance rate of 14.7%).",
-                "Leveraged Docker to create consistent and isolated development environments",
-                "Demonstrated strong problem-solving and analytical skills by independently designing and implementing a comprehensive VR application from scratch, meeting all project requirements and delivering the project ahead of schedule.",
-                "Collected data from 58 participants, each viewing 50 short videos.",
-                "We developed adaptive bitrate streaming for VR integrating human factors to prioritize higher video quality during points of interest in a video to improve the overall QoE.",
-                "Tech stack: DOCKER, PyTorch, Python, Pandas, C++, C#,Unity.",
-                "Worked as TA for Design and Analysis of Algorithms class and Introduction to Probability and Statistics class."
+                "Developed scalable RESTful APIs and microservices using Java, Spring Boot, and Kafka in a distributed microservices architecture, supporting high-volume product and order processing workflows."
+                "Implemented OAuth2/JWT authentication and role-based access control (RBAC) using Spring Security, securing 20+ APIs across multiple services."
+                "Designed event-driven architecture using Apache Kafka, enabling real-time inventory and order processing across distributed systems."
+                "Deployed cloud-native applications on AWS (EC2, RDS, S3) using Docker and implemented CI/CD pipelines using Jenkins, reducing deployment time by 40%."
+                "Improved application performance and database performance by 30% through query optimization, indexing, and backend performance tuning."
+                "Built Angular single-page applications integrated with REST APIs, improving user workflow efficiency by 25%."
+                "Accelerated development velocity by integrating GitHub Copilot and agentic AI tools into daily engineering workflows, improving code quality, test coverage, and delivery speed across microservices projects."
+                "Collaborated with cross-functional teams including QA, DevOps, and product owners to deliver scalable features on time in Agile sprints."
+                ]
+        },
+        {
+            "company": "USAA- American Insurance and Financial Company",
+            "location": "Hyderabad, India",
+            "duration": "Aug 2021 - Feb 2024",
+            "position": "Fullstack Software Engineer",
+            "achievements": [
+                "Developed and maintained scalable microservices and REST/GraphQL APIs processing 10M+ daily transactions using Node.js, PostgreSQL, and MongoDB."
+                "Improved backend performance by 25% through query optimization and system performance tuning."
+                "Built responsive React applications using Redux and TypeScript, improving user engagement by 40%."
+                "Implemented CI/CD pipelines and automated deployments, reducing release time by 30%."
+                "Participated in system design, code reviews, and production deployments in an Agile/Scrum environment."
+                "Integrated secure authentication and authorization mechanisms using JWT and OAuth standards for customer-facing applications."
+
             ]
         },
         {
-            "company": "Accenture",
-            "location": "Telangana, India",
-            "duration": "Aug 2021 - Jul 2022",
-            "position": "Fullstack Software Engineer",
+            "company": "Quesite",
+            "location": "Hyderabad, India",
+            "duration": "Aug 2020 - May 2021",
+            "position": "Software Developer",
             "achievements": [
-                "Used JAVA and frameworks such as Spring-MVC, Spring boot, Hibernate, JUnit, and Mockito to develop new functionalities, fix existing defects, and perform unit testing in an Airplane Cargo Management project, catering to esteemed airline clients.",
-                "Developed and maintained interactive user interfaces using React, significantly improving user experience.",
-                "Wrote SQL queries to retrieve and update the tables in the database.",
-                "developed and maintained microservices.",
-                "used GIT and JIRA for everyday version control and project management tasks.",
-                "Worked on XML HTTP requests and responses.",
-                "Tech stack: JAVA, SQL, Java Spring, MVC, Junit, XML, JSON, Shell scripting, GIT, JIRA, Maven."
+                "Developed enterprise web applications using AngularJS, Core Java, and REST APIs for employee management and payroll systems."
+                "Implemented client-side validation and exception handling, reducing data entry errors by 20%."
+                "Designed SQL stored procedures, triggers, and scheduled jobs, automating payroll processing workflows."
+                "Applied object-oriented design principles and modular architecture, improving code maintainability."
+                "Used Git and worked in an Agile development environment." 
             ]
         }
     ],
@@ -80,17 +92,16 @@ resume_content = {
         {
             "school": "University of Texas at Arlington",
             "location": "Texas, USA",
-            "duration": "Aug 2022 - May 2024",
-            "degree": "M.S. in Computer Science",
+            "duration": "Jan 2024 - Dec 2025",
+            "degree": "M.S. in Mathematics and Computer Science",
             "gpa": "3.9/4.0",
             "specialization": "Big Data and Machine Learning"
         },
         {
-            "school": "Bharat Institute of Engineering and Technology",
-            "location": "Telangana, India",
+            "school": "Srinidhi Institute of Science and Technology",
+            "location": "Hyderabad, India",
             "duration": "Aug 2017 - May 2021",
             "degree": "B.Tech in Computer Science",
-            "gpa": "7.3/10"
         }
     ]
 }
