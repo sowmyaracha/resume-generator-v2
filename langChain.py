@@ -23,7 +23,6 @@ import secrets
 
 load_dotenv()
 
-print(type(resume_content))
 
 class Extract_JD(BaseModel):
     requires_citizenship : str = Field("Does the job require US citizenship? Answer yes, no or not sure.")
@@ -407,8 +406,6 @@ async def generate_resume(input_data: GenerateResumeInput):
     skills = input_data.skills
     projects = input_data.projects
     print(projects)
-        if i < len(projects):
-            project['description'] = projects[i]
     
     return {"message": "Resume generated successfully"}
 
