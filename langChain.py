@@ -12,8 +12,6 @@ from fastapi.responses import FileResponse
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.requests import Request
 from fastapi.responses import RedirectResponse
-from lat import resume_content
-import lat1
 from dotenv import load_dotenv
 from authlib.integrations.starlette_client import OAuth
 from starlette.requests import Request
@@ -293,7 +291,6 @@ async def process_skills(input_data:ResumeSkills):
      skills = input_data.skills
      print(jd,skills)
      output = process_skills_chain(jd,skills)
-     lat1.resume_content["skills"] = [output]
      return {"output":output}
 
 @app.post("/processed_resume_content")
@@ -394,8 +391,6 @@ async def get_resume_content(request: Request):
                 "projects": profile.get('projects', [])
             }
     return {
-        "skills": lat1.resume_content.get('skills', []),
-        "projects": lat1.resume_content.get('projects', [])
     }
 
 @app.get("/populate_resumes")
@@ -412,13 +407,9 @@ async def generate_resume(input_data: GenerateResumeInput):
     skills = input_data.skills
     projects = input_data.projects
     print(projects)
-    lat1.resume_content["skills"] = [skills]
-    for i, project in enumerate(lat1.resume_content["projects"]):
         if i < len(projects):
             project['description'] = projects[i]
-            lat1.resume_content["projects"][i]['description'] = projects[i]
     
-    lat1.main()
     return {"message": "Resume generated successfully"}
 
 @app.get("/analyzer")
